@@ -1,0 +1,6 @@
+scheduling:
+  enabled: false
+
+service:
+  count_company: 44
+  buffer_size: 5
