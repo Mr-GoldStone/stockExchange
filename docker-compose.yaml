@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "stockExchangeDb"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "qwerty"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      TZ: "GMT+2"
+      PGTZ: "GMT+2"
+#      TZ: "Europe/Kyiv"
+#      PGTZ: "Europe/Kyiv"
+    volumes:
+      - ./src/main/resources:/docker-entrypoint-initdb.d
+      - postgres-test-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-test-data:

@@ -1,0 +1,43 @@
+api:
+  external:
+    ref-data-url: https://cloud.iexapis.com/stable/ref-data/symbols?token={token}
+    stock-data-url: https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={token}
+    token: pk_b62da9ebf72c4b1a9dc1c937108e13d4
+
+rds:
+  db:
+    url: fromAmazon
+    username: fromAmazon
+    password: fromAmazon
+
+local:
+  db:
+    url: localhost:5432/stockExchangeDb
+    username: user
+    password: qwerty
+    enabled: true
+
+logging:
+#  level:
+#    io.r2dbc.postgresql.QUERY: debug # for queries
+#    io.r2dbc.postgresql.PARAM: debug # for parameters
+
+scheduling:
+  enabled: true
+
+
+service:
+  count_company: 50
+  buffer_size: 10
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://${local.db.url}
+    username: ${local.db.username}
+    password: ${local.db.password}
+#    pool:
+#      enabled: true
+#      initial-size: 5
+#      max-size: 10
+
+# https://docs.google.com/document/d/1oJvUcVJp3HG7zXEooxzupnMOAOGKvRhIoEmyzjNKwcw/edit
