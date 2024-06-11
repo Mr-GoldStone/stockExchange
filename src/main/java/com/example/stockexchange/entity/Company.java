@@ -1,9 +1,6 @@
 package com.example.stockexchange.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -12,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table("company")
+@Table("companies")
 public class Company {
 
     @Id
@@ -24,5 +21,6 @@ public class Company {
     @Column("company_name")
     private String name;
     @Column("is_enabled")
-    private boolean isEnabled;
+    @Getter
+    private Boolean isEnabled;
 }
