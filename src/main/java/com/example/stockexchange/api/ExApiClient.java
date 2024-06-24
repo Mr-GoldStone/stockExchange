@@ -6,13 +6,12 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 
 @Slf4j
 @Component
@@ -30,18 +29,18 @@ public class ExApiClient {
     private String token;
 
     public Flux<Company> getCompanies() {
-       return webClient.get()
-                .uri(refDataUrl, token)
-                .retrieve()
-                .bodyToFlux(Company.class);
+        return webClient.get()
+            .uri(refDataUrl, token)
+            .retrieve()
+            .bodyToFlux(Company.class);
     }
 
-    public Mono<Stock> getStockBySymbol (String symbol) {
+    public Mono<Stock> getStockBySymbol(String symbol) {
         return webClient.get()
-                .uri(stockDataUrl, symbol, token)
-                .retrieve()
-                .bodyToMono(Stock.class)
-                .onErrorResume(WebClientResponseException.class,
-                        ex -> ex.getStatusCode() == HttpStatusCode.valueOf(429) ? this.getStockBySymbol(symbol) : Mono.error(ex));
+            .uri(stockDataUrl, symbol, token)
+            .retrieve()
+            .bodyToMono(Stock.class)
+            .onErrorResume(WebClientResponseException.class,
+                ex -> ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS ? this.getStockBySymbol(symbol) : Mono.error(ex));
     }
 }

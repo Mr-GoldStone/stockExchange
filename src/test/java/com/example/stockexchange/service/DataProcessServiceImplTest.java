@@ -3,8 +3,8 @@ package com.example.stockexchange.service;
 import com.example.stockexchange.api.ExApiClient;
 import com.example.stockexchange.entity.Company;
 import com.example.stockexchange.entity.Stock;
-import com.example.stockexchange.repository.CustomCompanyRepository;
-import com.example.stockexchange.repository.CustomStockRepository;
+import com.example.stockexchange.repository.CompanyRepository;
+import com.example.stockexchange.repository.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,9 +33,9 @@ class DataProcessServiceImplTest {
     @Mock
     private ExApiClient mockClient;
     @Mock
-    private CustomStockRepository customStockRepository;
+    private StockRepository stockRepository;
     @Mock
-    private CustomCompanyRepository customCompanyRepository;
+    private CompanyRepository companyRepository;
     @Mock
     private DataProcessServiceImpl.CompanySymbolHolder holder = new DataProcessServiceImpl.CompanySymbolHolder();
 
@@ -65,14 +65,14 @@ class DataProcessServiceImplTest {
 
 //        when
         when(mockClient.getCompanies()).thenReturn(companies);
-        when(customCompanyRepository.save(anyList())).thenReturn(Flux.just(company1, company3));
+        when(companyRepository.save(anyList())).thenReturn(Flux.just(company1, company3));
 
 //        then
         StepVerifier.create(dataProcessService.processingCompanyData())
             .expectNext(company1, company3)
             .verifyComplete();
         verify(mockClient, times(1)).getCompanies();
-        verify(customCompanyRepository, times(1)).save(any());
+        verify(companyRepository, times(1)).save(any());
     }
 
     @Test
@@ -86,17 +86,17 @@ class DataProcessServiceImplTest {
 
 //        when
         when(mockClient.getCompanies()).thenReturn(Flux.just(company1));
-        when(customCompanyRepository.save(anyList())).thenThrow(UnsupportedOperationException.class);
+        when(companyRepository.save(anyList())).thenThrow(UnsupportedOperationException.class);
 
 //        then
         StepVerifier.create(dataProcessService.processingCompanyData().log())
             .verifyError();
         verify(mockClient, times(1)).getCompanies();
-        verify(customCompanyRepository, times(1)).save(any());
+        verify(companyRepository, times(1)).save(any());
     }
 
     @Test
-    void processStockData_savaStocks_ok() throws NoSuchFieldException {
+    void processStockData_saveStocks_ok(){
 //        given
         Stock stock1 = Stock.builder()
             .latestPrice(1.0f)
@@ -117,18 +117,18 @@ class DataProcessServiceImplTest {
         when(holder.getSymbols()).thenReturn(List.of("A", "B"));
         when(mockClient.getStockBySymbol("A")).thenReturn(Mono.just(stock1));
         when(mockClient.getStockBySymbol("B")).thenReturn(Mono.just(stock2));
-        when(customStockRepository.save(List.of(stock1, stock2))).thenReturn(Flux.just(stock1, stock2));
+        when(stockRepository.save(List.of(stock1, stock2))).thenReturn(Flux.just(stock1, stock2));
 
 //        then
         StepVerifier.create(dataProcessService.processingStockData().log())
             .expectNextCount(2)
             .verifyComplete();
         verify(mockClient, times(2)).getStockBySymbol(anyString());
-        verify(customStockRepository, times(1)).save(any());
+        verify(stockRepository, times(1)).save(any());
     }
 
     @Test
-    void processStockData_savaStocks_fail() throws NoSuchFieldException {
+    void processStockData_saveStocks_fail() {
 //        given
         Stock stock1 = Stock.builder()
             .latestPrice(1.0f)
@@ -149,13 +149,13 @@ class DataProcessServiceImplTest {
         when(holder.getSymbols()).thenReturn(List.of("A", "B"));
         when(mockClient.getStockBySymbol("A")).thenReturn(Mono.just(stock1));
         when(mockClient.getStockBySymbol("B")).thenReturn(Mono.just(stock2));
-        when(customStockRepository.save(List.of(stock1, stock2))).thenThrow(UnsupportedOperationException.class);
+        when(stockRepository.save(List.of(stock1, stock2))).thenThrow(UnsupportedOperationException.class);
 
 //        then
         StepVerifier.create(dataProcessService.processingStockData().log())
             .verifyError();
         verify(mockClient, times(2)).getStockBySymbol(anyString());
-        verify(customStockRepository, times(1)).save(any());
+        verify(stockRepository, times(1)).save(any());
     }
 
 

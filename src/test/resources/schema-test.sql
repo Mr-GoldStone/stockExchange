@@ -1,5 +1,5 @@
 --company
-create table if not exists company(
+create table if not exists companies(
     id bigserial PRIMARY KEY,
     symbol varchar(255),
     company_name varchar(255),
@@ -8,7 +8,7 @@ create table if not exists company(
 );
 
 --stock
-create table if not exists stock(
+create table if not exists stocks(
     id bigserial PRIMARY KEY,
     latestPrice real,
     change real ,
@@ -16,4 +16,4 @@ create table if not exists stock(
     company_name VARCHAR(255) NOT NULL,
     symbol VARCHAR(255) NOT NULL,
     unique (company_name)
-    );
+);

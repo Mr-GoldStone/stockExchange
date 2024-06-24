@@ -1,14 +1,13 @@
 package com.example.stockexchange.service;
 
 import com.example.stockexchange.entity.Stock;
-import com.example.stockexchange.repository.CustomStockRepository;
+import com.example.stockexchange.repository.StockRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -17,7 +16,7 @@ import static org.mockito.Mockito.*;
 class AnalyticServiceImplTest {
 
     @Mock
-    private CustomStockRepository stockRepository;
+    private StockRepository stockRepository;
 
     @InjectMocks
     private AnalyticServiceImpl analyticService;
@@ -42,11 +41,9 @@ class AnalyticServiceImplTest {
             .verifyComplete();
 
         verify(stockRepository, times(1)).get5MaxStockChangePercent();
-
     }
 
     private List<Stock> generate5Stock() {
         return List.of(new Stock(), new Stock(), new Stock(), new Stock(), new Stock());
     }
-
 }

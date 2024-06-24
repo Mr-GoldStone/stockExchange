@@ -1,6 +1,6 @@
 package com.example.stockexchange.repository;
 
-import com.example.stockexchange.TestConfig;
+import com.example.stockexchange.config.TestConfig;
 import com.example.stockexchange.entity.Company;
 import io.r2dbc.spi.Statement;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -22,12 +21,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
-@DataR2dbcTest
+@DataR2dbcTest(properties = "scheduling.enabled=false")
 @Testcontainers
 @Import(TestConfig.class)
-@ActiveProfiles("test")
-class CustomCompanyRepositoryTest {
+class CompanyRepositoryTest {
     @Container
     static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12")
         .withCopyFileToContainer(MountableFile.forClasspathResource("schema-test.sql"), "/docker-entrypoint-initdb.d/init.sql");
@@ -44,9 +41,9 @@ class CustomCompanyRepositoryTest {
     @Autowired
     R2dbcEntityTemplate template;
     @Autowired
-    CustomCompanyRepository companyRepository;
+    CompanyRepository companyRepository;
 
-    public final static String SELECT_ALL = "select * from company";
+    public final static String SELECT_ALL = "select * from companies";
 
     @Test
     public void testDatabaseClientExisted() {

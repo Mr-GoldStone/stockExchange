@@ -8,30 +8,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-
 import java.util.List;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class CustomStockRepository {
+public class StockRepository {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     private final static String UPSERT_STOCK_QUERY = """
-            insert into stock (latestprice, change, changepercent, company_name, symbol)
-            values ($1, $2, $3, $4, $5) on conflict (company_name) do update
-            set latestprice = excluded.latestprice,
+            insert into stocks (latest_price, change, change_percent, company_name, symbol)
+            values ($1, $2, $3, $4, $5) on conflict (symbol) do update
+            set latest_price = excluded.latest_price,
                 change = excluded.change,
-                changepercent = excluded.changepercent
+                change_percent = excluded.change_percent
             """;
     private final static String SELECT_TOP_5_MAX_PRICE = """
-            select * from stock order by  latestprice desc, company_name limit 5;
+            select * from stocks order by  latest_price desc, company_name limit 5;
             """;
     private final static String SELECT_5_ABSOLUTE_MAX_CHANGE_PERCENT = """
-            select * from stock order by abs(changepercent) desc limit 5;
+            select * from stocks order by abs(change_percent) desc limit 5;
             """;
-
 
     public Flux<Stock> save(List<Stock> stocks) {
         return r2dbcEntityTemplate.getDatabaseClient().inConnectionMany(connection -> {
@@ -71,7 +69,6 @@ public class CustomStockRepository {
                     .flatMap(result -> result.map((row, metadata) -> toStock(row)))
                     .doOnComplete(() -> log.debug("REPO: 5 max stock change in percent were got"))
                     .doOnError(error -> log.error("Requesting to repo caused an error {}", error.toString()));
-
         });
     }
 
@@ -79,10 +76,8 @@ public class CustomStockRepository {
         return Stock.builder()
                 .id((Long) row.get("id"))
                 .companyName((String) row.get("company_name"))
-                .changePercent((Float) row.get("changePercent"))
-                .latestPrice((Float) row.get("latestPrice"))
+                .changePercent((Float) row.get("change_percent"))
+                .latestPrice((Float) row.get("latest_price"))
                 .build();
     }
-
-
 }

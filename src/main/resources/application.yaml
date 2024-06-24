@@ -17,14 +17,8 @@ local:
     password: qwerty
     enabled: true
 
-logging:
-#  level:
-#    io.r2dbc.postgresql.QUERY: debug # for queries
-#    io.r2dbc.postgresql.PARAM: debug # for parameters
-
 scheduling:
   enabled: true
-
 
 service:
   count_company: 50
@@ -40,4 +34,5 @@ spring:
 #      initial-size: 5
 #      max-size: 10
 
+# task
 # https://docs.google.com/document/d/1oJvUcVJp3HG7zXEooxzupnMOAOGKvRhIoEmyzjNKwcw/edit

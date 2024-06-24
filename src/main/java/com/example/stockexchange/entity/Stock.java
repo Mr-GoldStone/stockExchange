@@ -9,28 +9,25 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder()
-@Table("stock")
+@Table("stocks")
 public class Stock {
 
     @Id
     private Long id;
-
-    @Column("latestPrice")
+    @Column("latest_price")
     private Float latestPrice;
     @Column("change")
     private Float change;
-    @Column("changePercent")
+    @Column("change_percent")
     private Float changePercent;
     @Column("company_name")
     private String companyName;
     @Column("symbol")
     private String symbol;
-
     @Transient
     private Company company;
 }

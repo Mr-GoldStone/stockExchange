@@ -1,7 +1,7 @@
 package com.example.stockexchange.service;
 
 import com.example.stockexchange.entity.Stock;
-import com.example.stockexchange.repository.CustomStockRepository;
+import com.example.stockexchange.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class AnalyticServiceImpl implements AnalyticService {
 
-  private final CustomStockRepository stockRepository;
+  private final StockRepository stockRepository;
 
     @Override
     public Flux<Stock> getTop5MaxStockPrice() {

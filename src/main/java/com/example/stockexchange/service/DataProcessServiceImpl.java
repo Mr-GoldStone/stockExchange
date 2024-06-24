@@ -3,8 +3,8 @@ package com.example.stockexchange.service;
 import com.example.stockexchange.api.ExApiClient;
 import com.example.stockexchange.entity.Company;
 import com.example.stockexchange.entity.Stock;
-import com.example.stockexchange.repository.CustomCompanyRepository;
-import com.example.stockexchange.repository.CustomStockRepository;
+import com.example.stockexchange.repository.CompanyRepository;
+import com.example.stockexchange.repository.StockRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,23 +29,21 @@ public class DataProcessServiceImpl implements DataProcessService {
     private Integer bufferSize;
     private final ExApiClient client;
     private final CompanySymbolHolder companySymbolHolder = new CompanySymbolHolder();
-    private final CustomStockRepository customStockRepository;
-    private final CustomCompanyRepository customCompanyRepository;
+    private final StockRepository stockRepository;
+    private final CompanyRepository companyRepository;
 
     @Override
     public Flux<Company> processingCompanyData() {
         companySymbolHolder.getSymbols().clear();
         return client.getCompanies()
-                .filter(Company::isEnabled)
+                .filter(Company::getIsEnabled)
                 .take(countCompany)
                 .doOnNext(companySymbolHolder::add)
-                .log()
                 .buffer(bufferSize)
-                .flatMap(customCompanyRepository::save)
+                .flatMap(companyRepository::save)
                 .doFirst(() -> log.info("Processing company data in service is running"))
                 .doOnComplete(() -> log.info("Processing company data in service was finished "))
                 .doOnError(err -> log.error("FIND Error {}", err.getMessage()));
-//                .onErrorContinue((error, obj) -> log.error("error:[{}]", error.getMessage()));
     }
 
     @Override
@@ -53,10 +51,9 @@ public class DataProcessServiceImpl implements DataProcessService {
         return Flux.fromIterable(companySymbolHolder.getSymbols())
                 .flatMap(client::getStockBySymbol)
                 .buffer(bufferSize)
-                .flatMap(customStockRepository::save)
+                .flatMap(stockRepository::save)
                 .doOnComplete(() -> log.info("Processing stock data in service was finished "))
                 .doOnError(err -> log.error("FIND Error {}", err.getMessage()));
-//                .onErrorContinue((error, obj) -> log.error("error:[{}]", error.getMessage()));
     }
 
     @Getter
@@ -68,15 +65,6 @@ public class DataProcessServiceImpl implements DataProcessService {
 
         public void add(Company company) {
             symbols.add(company.getSymbol());
-//            log.info("Add company: {} symbol into list", company.getName());
-        }
-
-        public String get() {
-            String symbol = symbols.get(index.getAndIncrement());
-            if (symbols.size() == index.get()) {
-                index.set(ZERO_INDEX);
-            }
-            return symbol;
         }
     }
 }
